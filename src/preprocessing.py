@@ -79,6 +79,5 @@ def preprocessing_script():
 
     return df
 
-df = preprocessing_script()
-print(df.head())
+
 
