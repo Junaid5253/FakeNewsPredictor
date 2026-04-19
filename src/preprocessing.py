@@ -1,11 +1,16 @@
 import pandas as pd
+from pathlib import Path
 import string
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import nltk
-nltk.download('punkt')
-nltk.download('punkt_tab')
-nltk.download('stopwords')
+
+# Download once (safe check)
+nltk.download('punkt', quiet=True)
+nltk.download('stopwords', quiet=True)
+
+# Global stopwords (efficient)
+stop_words = set(stopwords.words('english'))
 
 # 1. Load Data
 def load_data(fake_path, true_path):
@@ -20,14 +25,13 @@ def load_data(fake_path, true_path):
 
 # 2. Merge DataFrames
 def merge_data(df1, df2):
-    df = pd.concat([df1, df2], axis=0).reset_index(drop=True)
-    return df
+    return pd.concat([df1, df2], axis=0).reset_index(drop=True)
 
 
 # 3. Drop unnecessary columns
 def drop_columns(df):
     if 'date' in df.columns:
-        df = df.drop('date', axis=1)
+        df = df.drop(columns=['date'])
     return df
 
 
@@ -39,19 +43,10 @@ def create_content(df):
 
 # 5. Text Cleaning
 def clean_text(text):
-    # Lowercase
     text = text.lower()
-    
-    # Remove punctuation
     text = text.translate(str.maketrans('', '', string.punctuation))
-    
-    # Tokenization
     words = word_tokenize(text)
-    
-    # Remove stopwords
-    stop_words = set(stopwords.words('english'))
     words = [w for w in words if w not in stop_words]
-    
     return " ".join(words)
 
 
@@ -61,9 +56,8 @@ def preprocess(df):
     return df
 
 
-from pathlib import Path
-
-def preprocessing_script():
+# 7. Main function to save cleaned data
+def save_clean_data():
     BASE_DIR = Path(__file__).resolve().parent.parent
     DATA_DIR = BASE_DIR / "data"
 
@@ -77,7 +71,14 @@ def preprocessing_script():
     df = create_content(df)
     df = preprocess(df)
 
-    return df
+    # Ensure directory exists
+    save_path = DATA_DIR / "clean_data.csv"
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+
+    df.to_csv(save_path, index=False)
+
+    print(f"Clean data saved at: {save_path}")
 
 
-
+if __name__ == "__main__":
+    save_clean_data()
