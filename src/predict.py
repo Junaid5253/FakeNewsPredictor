@@ -48,7 +48,7 @@ def predict_news(text, model_name="svm"):
     return label, prob
 
 if __name__ == "__main__":
-    print("🔍 Fake News Detector")
+    print("Fake News Detector")
 
     text = input("Enter news text: ")
     model_choice = input("Choose model (svm / logreg / nb): ").strip().lower()
